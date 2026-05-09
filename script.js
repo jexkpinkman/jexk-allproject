@@ -2,12 +2,12 @@
 //  KONFIGURASI FIREBASE  —  GANTI 6 BARIS DI BAWAH INI
 // ═══════════════════════════════════════════════════════════════
 const firebaseConfig = {
-  apiKey: "AIzaSy...",           // GANTI: dari Firebase Project Settings
-  authDomain: "project-id.firebaseapp.com",  // GANTI
-  projectId: "project-id",       // GANTI
-  storageBucket: "project-id.appspot.com",   // GANTI
-  messagingSenderId: "123456789", // GANTI
-  appId: "1:123456789:web:abcdef" // GANTI
+  apiKey: "AIzaSyCMN7YRHNJBVREdvJKesahrXP2OQzgNhwc",
+  authDomain: "jexk-projects-2603b.firebaseapp.com",
+  projectId: "jexk-projects-2603b",
+  storageBucket: "jexk-projects-2603b.firebasestorage.app",
+  messagingSenderId: "368459860542",
+  appId: "1:368459860542:web:012f23bf97b6864eaa9f6f"
 };
 
 // ═══════════════════════════════════════════════════════════════
