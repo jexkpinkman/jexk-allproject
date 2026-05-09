@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Jexk Projects | All Works</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<video autoplay loop muted playsinline id="bg-video">
+  <source src="https://jexkcdn-production.up.railway.app/file/jexk-cdn/1778159727798-VID-20260507-WA0091.mp4" type="video/mp4">
+</video>
+<div class="video-overlay"></div>
+
+<nav id="navbar" class="glass-nav">
+  <a href="#home" class="logo">Jexk.</a>
+  <div class="nav-links" id="navLinksDesktop">
+    <a href="#home" class="nav-link active">Home</a>
+    <a href="#projects" class="nav-link">Projects</a>
+    <a href="#stats" class="nav-link">Stats</a>
+    <button id="adminBtn" class="nav-link" style="background:none;border:none;cursor:pointer;"><i class="fa-solid fa-lock"></i> Admin</button>
+    <button id="logoutBtn" class="nav-link" style="background:none;border:none;cursor:pointer;display:none;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+  </div>
+  <div class="nav-actions">
+    <button id="mobile-menu-btn" class="nav-btn mobile-only"><i class="fa-solid fa-bars-staggered"></i></button>
+  </div>
+</nav>
+
+<div class="mobile-overlay" id="mobileMenu">
+  <button id="close-menu-btn"><i class="fa-solid fa-xmark"></i></button>
+  <div class="mobile-links">
+    <a href="#home" class="mobile-link active">Home</a>
+    <a href="#projects" class="mobile-link">Projects</a>
+    <a href="#stats" class="mobile-link">Stats</a>
+  </div>
+</div>
+
+<header id="home" class="section hero">
+  <div class="container text-center reveal">
+    <div class="badge glass">All Projects Archive</div>
+    <h1 class="hero-title">Jexk <span class="gradient-text">Projects</span></h1>
+    <p class="hero-desc">Kumpulan semua project yang telah dikerjakan. Dari tools downloader, cloud storage, AI enhancer, sampai background remover.</p>
+    <div class="btn-group">
+      <a href="#projects" class="btn btn-primary">Lihat Semua <i class="fa-solid fa-arrow-down"></i></a>
+      <a href="https://github.com/jexkpinkman" target="_blank" class="btn btn-glass"><i class="fa-brands fa-github"></i> GitHub</a>
+    </div>
+    <div class="social-links mt-5">
+      <a href="https://wa.me/6285212645395" class="glass-icon"><i class="fa-brands fa-whatsapp"></i></a>
+      <a href="https://t.me/Jack_pinkman" class="glass-icon"><i class="fa-brands fa-telegram"></i></a>
+      <a href="https://www.instagram.com/jackberantashama_" class="glass-icon"><i class="fa-brands fa-instagram"></i></a>
+    </div>
+  </div>
+</header>
+
+<section id="stats" class="section" style="padding-top:40px;">
+  <div class="container">
+    <div class="text-center reveal mb-5">
+      <h2 class="section-title">Quick <span class="gradient-text">Stats.</span></h2>
+    </div>
+    <div class="stats-grid reveal">
+      <div class="stat-box glass"><h3>20</h3><p>Years Old</p></div>
+      <div class="stat-box glass"><h3 id="stat-projects">4+</h3><p>Projects</p></div>
+      <div class="stat-box glass"><h3>1+</h3><p>Years Exp</p></div>
+      <div class="stat-box glass"><h3>4+</h3><p>Tech Stack</p></div>
+      <div class="stat-box glass"><h3>∞</h3><p>Coffee</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="projects" class="section">
+  <div class="container">
+    <div class="text-center reveal mb-5">
+      <h2 class="section-title">All <span class="gradient-text">Projects.</span></h2>
+      <p class="desc">Semua project dalam satu tempat. Data tersimpan di MongoDB Atlas.</p>
+    </div>
+    <div id="loadingState" style="display:none;">
+      <div class="project-grid">
+        <div class="project-card glass"><div style="width:100%;aspect-ratio:16/10;background:rgba(255,255,255,0.05);border-radius:16px;"></div><div style="padding:1rem;"><div style="width:60%;height:20px;background:rgba(255,255,255,0.05);border-radius:8px;margin-bottom:10px;"></div><div style="width:100%;height:14px;background:rgba(255,255,255,0.05);border-radius:8px;"></div></div></div>
+        <div class="project-card glass"><div style="width:100%;aspect-ratio:16/10;background:rgba(255,255,255,0.05);border-radius:16px;"></div><div style="padding:1rem;"><div style="width:60%;height:20px;background:rgba(255,255,255,0.05);border-radius:8px;margin-bottom:10px;"></div><div style="width:100%;height:14px;background:rgba(255,255,255,0.05);border-radius:8px;"></div></div></div>
+      </div>
+    </div>
+    <div class="project-grid" id="projectGrid"></div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <i class="fa-solid fa-folder-open"></i>
+      <h3>Belum Ada Project</h3>
+      <p>Login sebagai admin untuk menambahkan project pertama.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p>&copy; 2026 Jexk Pinkman. All Projects Archive.</p>
+  </div>
+</footer>
+
+<button class="fab-add hidden" id="fabAdd" title="Tambah Project"><i class="fa-solid fa-plus"></i></button>
+<div class="toast" id="toast"></div>
+
+<!-- Project Modal -->
+<div class="modal-overlay" id="projectModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Tambah Project</h3>
+      <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="projectForm">
+      <input type="hidden" id="projectId">
+      <div class="form-group"><label>Nama Project</label><input type="text" id="pTitle" required placeholder="Nama project..."></div>
+      <div class="form-group"><label>Deskripsi</label><textarea id="pDesc" required placeholder="Deskripsi singkat project..."></textarea></div>
+      <div class="form-group"><label>Link Project</label><input type="url" id="pLink" required placeholder="https://..."></div>
+      <div class="form-group"><label>URL Thumbnail</label><input type="url" id="pImage" required placeholder="https://..."></div>
+      <div class="form-group"><label>Tags (pisah dengan koma)</label><input type="text" id="pTags" placeholder="React, Node.js, AI"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-glass" id="btnCancel">Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal-content" style="max-width:400px;">
+    <div class="modal-header">
+      <h3 class="modal-title"><i class="fa-solid fa-lock"></i> Admin Login</h3>
+      <button class="modal-close" id="loginClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="loginForm">
+      <div class="form-group"><label>Email Admin</label><input type="email" id="loginEmail" required placeholder="admin@example.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="loginPass" required placeholder="••••••••"></div>
+      <div class="error-msg" id="loginError">Email atau password salah.</div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-glass" id="loginCancel">Batal</button>
+        <button type="submit" class="btn btn-primary">Login</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
