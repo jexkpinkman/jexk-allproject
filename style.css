@@ -31,6 +31,7 @@ a{text-decoration:none;color:inherit;}
 .hero-desc{font-size:clamp(0.9rem,3vw,1.1rem);color:var(--muted);max-width:650px;margin:0 auto 2.5rem;line-height:1.8;}
 
 .btn{padding:14px 32px;border-radius:50px;font-size:0.95rem;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all 0.3s;border:1px solid transparent;}
+.btn:active{transform:scale(0.95);}
 .btn-primary{background:var(--primary);color:#000;}
 .btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(255,255,255,0.2);}
 .btn-glass{background:var(--glass);border:1px solid var(--glass-border);color:var(--primary);}
