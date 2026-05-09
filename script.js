@@ -1,49 +1,42 @@
 // ═══════════════════════════════════════════════════════════════
-//  KONFIGURASI MONGODB ATLAS DATA API
-//  GANTI 3 BARIS DI BAWAH INI DENGAN DATA KAMU
+//  KONFIGURASI FIREBASE  —  GANTI 6 BARIS DI BAWAH INI
 // ═══════════════════════════════════════════════════════════════
-const MONGO_APP_ID = 'data-abcde';              // GANTI: dari Atlas → App Services → App ID
-const MONGO_API_KEY = 'YOUR_DATA_API_KEY';       // GANTI: dari Atlas → App Services → Data API → Create API Key
-const MONGO_CLUSTER = 'Cluster0';                // GANTI: nama cluster kamu (default: Cluster0)
-const MONGO_DB = 'portfolio';                    // Nama database
-const MONGO_COLLECTION = 'projects';             // Nama collection
+const firebaseConfig = {
+  apiKey: "AIzaSy...",           // GANTI: dari Firebase Project Settings
+  authDomain: "project-id.firebaseapp.com",  // GANTI
+  projectId: "project-id",       // GANTI
+  storageBucket: "project-id.appspot.com",   // GANTI
+  messagingSenderId: "123456789", // GANTI
+  appId: "1:123456789:web:abcdef" // GANTI
+};
 
-const API_BASE = `https://data.mongodb-api.com/app/${MONGO_APP_ID}/endpoint/data/v1/action`;
-
+// ═══════════════════════════════════════════════════════════════
+//  DEFAULT PROJECTS (FALLBACK)
+// ═══════════════════════════════════════════════════════════════
 const defaultProjects = [
-  { _id: "1", title: "Tools Downloader", desc: "Platform Tools Downloader All-In-One Untuk Mengunduh Video Dan Audio Dari Berbagai Sosial Media Dengan Cepat.", image: "https://jexk-cdn.vercel.app/file/jexk-cdn/1778250178838-file_00000000838c7208964e1efb89ce8476.png", link: "https://jexk-tools.vercel.app/", tags: ["Next.js", "Node.js"] },
-  { _id: "2", title: "Cloud Storage", desc: "Solusi Penyimpanan Cloud Pribadi Dengan Fitur Upload Drag-Drop, Folder Management, Dan Enkripsi File.", image: "https://jexk-cdn.vercel.app/file/jexk-cdn/1778250297227-file_00000000989072088561362a59c44dd2.png", link: "https://jexk-cdn.vercel.app/", tags: ["React", "Express"] },
-  { _id: "3", title: "HD Photo & Video Enhance", desc: "Web tool untuk meningkatkan kualitas foto dan video menjadi lebih HD menggunakan teknologi AI processing. Cocok untuk memperjelas gambar blur atau meningkatkan resolusi media.", image: "https://jexk-cdn.vercel.app/file/jexk-cdn/1778249951019-file_0000000002587208a5a076082bda2625.png", link: "https://jexk-enhance.vercel.app/", tags: ["AI", "Web Tool"] },
-  { _id: "4", title: "AI Background Remover", desc: "Web tool berbasis AI untuk menghapus background gambar secara otomatis. Upload foto lalu sistem akan memprosesnya dalam hitungan detik.", image: "https://jexk-cdn.vercel.app/file/jexk-cdn/1778261594321-file_0000000012b472088aba56071dca6add.png", link: "https://jexkremovebg.vercel.app/", tags: ["React", "Vite", "AI"] }
+  { id: "1", title: "Tools Downloader", desc: "Platform Tools Downloader All-In-One Untuk Mengunduh Video Dan Audio Dari Berbagai Sosial Media Dengan Cepat.", image: "https://jexk-cdn.vercel.app/file/jexk-cdn/1778250178838-file_00000000838c7208964e1efb89ce8476.png", link: "https://jexk-tools.vercel.app/", tags: ["Next.js", "Node.js"] },
+  { id: "2", title: "Cloud Storage", desc: "Solusi Penyimpanan Cloud Pribadi Dengan Fitur Upload Drag-Drop, Folder Management, Dan Enkripsi File.", image: "https://jexk-cdn.vercel.app/file/jexk-cdn/1778250297227-file_00000000989072088561362a59c44dd2.png", link: "https://jexk-cdn.vercel.app/", tags: ["React", "Express"] },
+  { id: "3", title: "HD Photo & Video Enhance", desc: "Web tool untuk meningkatkan kualitas foto dan video menjadi lebih HD menggunakan teknologi AI processing. Cocok untuk memperjelas gambar blur atau meningkatkan resolusi media.", image: "https://jexk-cdn.vercel.app/file/jexk-cdn/1778249951019-file_0000000002587208a5a076082bda2625.png", link: "https://jexk-enhance.vercel.app/", tags: ["AI", "Web Tool"] },
+  { id: "4", title: "AI Background Remover", desc: "Web tool berbasis AI untuk menghapus background gambar secara otomatis. Upload foto lalu sistem akan memprosesnya dalam hitungan detik.", image: "https://jexk-cdn.vercel.app/file/jexk-cdn/1778261594321-file_0000000012b472088aba56071dca6add.png", link: "https://jexkremovebg.vercel.app/", tags: ["React", "Vite", "AI"] }
 ];
 
+let db = null;
+let auth = null;
 let isAdmin = false;
 let projects = [];
 let editingId = null;
+let unsubscribe = null;
 
 // ═══════════════════════════════════════════════════════════════
-//  MONGODB API HELPER
+//  INIT FIREBASE
 // ═══════════════════════════════════════════════════════════════
-async function mongoRequest(action, body) {
-  const res = await fetch(`${API_BASE}/${action}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Request-Headers': '*',
-      'api-key': MONGO_API_KEY
-    },
-    body: JSON.stringify({
-      dataSource: MONGO_CLUSTER,
-      database: MONGO_DB,
-      collection: MONGO_COLLECTION,
-      ...body
-    })
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err);
-  }
-  return res.json();
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  auth = firebase.auth();
+  console.log('[OK] Firebase initialized');
+} catch (e) {
+  console.error('[FAIL] Firebase init:', e);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -65,7 +58,7 @@ function renderProjects() {
   if (empty) empty.style.display = 'none';
 
   const html = projects.map(p => {
-    const id = p._id || p.id;
+    const id = p.id;
     const tagsHtml = (p.tags || []).map(t => `<span class="tag mini">${escapeHtml(t)}</span>`).join('');
     const adminBtns = isAdmin ? `
       <div class="project-actions">
@@ -108,41 +101,52 @@ function escapeHtml(text) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  LOAD DATA
+//  LOAD DATA (REALTIME)
 // ═══════════════════════════════════════════════════════════════
-async function fetchProjects() {
+function fetchProjects() {
   document.getElementById('loadingState').style.display = 'block';
   document.getElementById('projectGrid').style.display = 'none';
-  document.getElementById('emptyState').style.display = 'none';
 
-  try {
-    const data = await mongoRequest('find', { filter: {}, sort: { _id: 1 } });
-    projects = data.documents || [];
-    if (projects.length === 0) {
-      console.log('[MongoDB] Collection kosong, pakai default');
-      projects = [...defaultProjects];
-    }
-    renderProjects();
-  } catch (e) {
-    console.error('[MongoDB Error]', e);
+  if (!db) {
+    console.warn('[WARN] Firebase not available, using defaults');
     projects = [...defaultProjects];
     renderProjects();
-    showToast('MongoDB error, pakai data default', 'error');
+    showToast('Mode offline: menampilkan data default', 'error');
+    return;
   }
+
+  // Realtime listener
+  unsubscribe = db.collection('projects').orderBy('createdAt', 'desc').onSnapshot(
+    (snapshot) => {
+      projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      if (projects.length === 0) {
+        console.log('[Firestore] Collection kosong, pakai default');
+        projects = [...defaultProjects];
+      }
+      renderProjects();
+    },
+    (error) => {
+      console.error('[Firestore Error]', error);
+      projects = [...defaultProjects];
+      renderProjects();
+      showToast('Firebase error, pakai default', 'error');
+    }
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  AUTH (SIMPLE)
+//  AUTH
 // ═══════════════════════════════════════════════════════════════
-async function checkSession() {
-  const session = localStorage.getItem('jexk_admin');
-  if (session === 'true') enableAdmin();
-  else disableAdmin();
+function checkSession() {
+  if (!auth) return;
+  auth.onAuthStateChanged(user => {
+    if (user) enableAdmin();
+    else disableAdmin();
+  });
 }
 
 function enableAdmin() {
   isAdmin = true;
-  localStorage.setItem('jexk_admin', 'true');
   document.getElementById('fabAdd').classList.remove('hidden');
   document.getElementById('adminBtn').style.display = 'none';
   document.getElementById('logoutBtn').style.display = 'inline-flex';
@@ -151,7 +155,6 @@ function enableAdmin() {
 
 function disableAdmin() {
   isAdmin = false;
-  localStorage.removeItem('jexk_admin');
   document.getElementById('fabAdd').classList.add('hidden');
   document.getElementById('adminBtn').style.display = 'inline-flex';
   document.getElementById('logoutBtn').style.display = 'none';
@@ -160,36 +163,21 @@ function disableAdmin() {
 
 async function loginAdmin(e) {
   e.preventDefault();
+  if (!auth) { showToast('Firebase tidak terhubung', 'error'); return; }
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPass').value;
-
   try {
-    const data = await mongoRequest('find', {
-      filter: { key: 'admin_credentials' }
-    });
-    const creds = data.documents?.[0];
-    if (creds && creds.email === email && creds.password === password) {
-      document.getElementById('loginError').classList.remove('show');
-      closeLoginModal();
-      enableAdmin();
-      showToast('Login berhasil!', 'success');
-    } else {
-      document.getElementById('loginError').classList.add('show');
-    }
-  } catch (e) {
-    // Fallback: hardcoded admin (ganti di bawah ini)
-    if (email === 'jexkpinkman@gmail.com' && password === 'admin123') {
-      document.getElementById('loginError').classList.remove('show');
-      closeLoginModal();
-      enableAdmin();
-      showToast('Login berhasil!', 'success');
-    } else {
-      document.getElementById('loginError').classList.add('show');
-    }
+    await auth.signInWithEmailAndPassword(email, password);
+    document.getElementById('loginError').classList.remove('show');
+    closeLoginModal();
+    showToast('Login berhasil!', 'success');
+  } catch (error) {
+    document.getElementById('loginError').classList.add('show');
   }
 }
 
-function logoutAdmin() {
+async function logoutAdmin() {
+  if (auth) { try { await auth.signOut(); } catch(e){} }
   disableAdmin();
   showToast('Logged out', 'success');
 }
@@ -199,6 +187,7 @@ function logoutAdmin() {
 // ═══════════════════════════════════════════════════════════════
 async function saveProject(e) {
   e.preventDefault();
+  if (!db || !isAdmin) { showToast('Tidak punya akses', 'error'); return; }
   const title = document.getElementById('pTitle').value.trim();
   const desc = document.getElementById('pDesc').value.trim();
   const link = document.getElementById('pLink').value.trim();
@@ -207,39 +196,31 @@ async function saveProject(e) {
 
   try {
     if (editingId) {
-      await mongoRequest('updateOne', {
-        filter: { _id: { $oid: editingId } },
-        update: { $set: { title, desc, link, image, tags } }
-      });
+      await db.collection('projects').doc(editingId).update({ title, desc, link, image, tags, updatedAt: new Date() });
       showToast('Project diperbarui!', 'success');
     } else {
-      await mongoRequest('insertOne', {
-        document: { title, desc, link, image, tags, createdAt: new Date().toISOString() }
-      });
+      await db.collection('projects').add({ title, desc, link, image, tags, createdAt: new Date() });
       showToast('Project ditambahkan!', 'success');
     }
     closeProjectModal();
-    await fetchProjects();
   } catch (e) {
     showToast('Error: ' + e.message, 'error');
   }
 }
 
 async function deleteProject(id) {
+  if (!db || !isAdmin) { showToast('Tidak punya akses', 'error'); return; }
   if (!confirm('Yakin mau hapus project ini?')) return;
   try {
-    await mongoRequest('deleteOne', {
-      filter: { _id: { $oid: id } }
-    });
+    await db.collection('projects').doc(id).delete();
     showToast('Project dihapus', 'success');
-    await fetchProjects();
   } catch (e) {
     showToast('Error: ' + e.message, 'error');
   }
 }
 
 function editProject(id) {
-  const p = projects.find(x => (x._id || x.id) === id);
+  const p = projects.find(x => x.id === id);
   if (!p) return;
   editingId = id;
   document.getElementById('pTitle').value = p.title;
