@@ -453,10 +453,19 @@ async function saveProject(e) {
 
   try {
     if (editingId) {
-      await db.collection('projects').doc(editingId).update({ title, desc, link, image, tags, updatedAt: new Date() });
-      showToast('Project diperbarui!', 'success');
+      // Cek apakah dokumen sudah ada di Firestore
+      const docRef = db.collection('projects').doc(editingId);
+      const docSnap = await docRef.get();
+      if (docSnap.exists) {
+        await docRef.update({ title, desc, link, image, tags, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        showToast('Project diperbarui!', 'success');
+      } else {
+        // Dokumen belum ada (default project), buat baru
+        await docRef.set({ title, desc, link, image, tags, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        showToast('Project disimpan ke database!', 'success');
+      }
     } else {
-      await db.collection('projects').add({ title, desc, link, image, tags, createdAt: new Date() });
+      await db.collection('projects').add({ title, desc, link, image, tags, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       showToast('Project ditambahkan!', 'success');
     }
     closeProjectModal();
@@ -469,8 +478,17 @@ async function deleteProject(id) {
   if (!db || !isAdmin) { showToast('Tidak punya akses', 'error'); return; }
   if (!confirm('Yakin mau hapus project ini?')) return;
   try {
-    await db.collection('projects').doc(id).delete();
-    showToast('Project dihapus', 'success');
+    const docRef = db.collection('projects').doc(id);
+    const docSnap = await docRef.get();
+    if (docSnap.exists) {
+      await docRef.delete();
+      showToast('Project dihapus', 'success');
+    } else {
+      // Default project, hapus dari array lokal
+      projects = projects.filter(p => p.id !== id);
+      renderProjects();
+      showToast('Project dihapus (lokal)', 'success');
+    }
   } catch (e) {
     showToast('Error: ' + e.message, 'error');
   }
